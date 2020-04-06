@@ -31,13 +31,22 @@ class Button(pygame.sprite.Sprite):
 
 
 class Text(pygame.sprite.Sprite):
-    def __init__(self, text, color, width, height, font):
+    def __init__(self, text, color, width, height, font, align='center'):
         pygame.sprite.Sprite.__init__(self)
         self.text_surface = font.render(text, True, color)
-        self.image = pygame.Surface((len(text)*17, 30))
-        self.text_rect = self.text_surface.get_rect(center=self.image.get_rect().center)
-        self.image.blit(self.text_surface, self.text_rect)
-        self.rect = self.image.get_rect(center=(width, height))
+        self.image = pygame.Surface((len(text)*17, 50))
+        if align == 'center':
+            self.text_rect = self.text_surface.get_rect(center=self.image.get_rect().center)
+            self.image.blit(self.text_surface, self.text_rect)
+            self.rect = self.image.get_rect(center=(width, height))
+        elif align == 'right':
+            self.text_rect = self.text_surface.get_rect(topright=self.image.get_rect().topright)
+            self.image.blit(self.text_surface, self.text_rect)
+            self.rect = self.image.get_rect(topright=(width, height))
+        elif align == 'left':
+            self.text_rect = self.text_surface.get_rect(topleft=self.image.get_rect().topleft)
+            self.image.blit(self.text_surface, self.text_rect)
+            self.rect = self.image.get_rect(topleft=(width, height))
 
 
 class InputText(pygame.sprite.Sprite):
