@@ -26,7 +26,7 @@ class Game:
         self.menu = 0
         self.name = ''
         self.character_class = ''
-        self.player = character.Player
+        self.player = character.Warrior(self.name)
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -34,6 +34,69 @@ class Game:
                 self.done = True
             for button in self.all_buttons:
                 button.handle_event(event)
+
+    def main_game(self):
+        self.all_buttons = pygame.sprite.Group()
+        self.all_text = pygame.sprite.Group()
+        self.done = False
+        self.game_window()
+        while not self.done:
+            self.handle_events()
+            self.run_logic()
+            self.draw()
+
+    def game_window(self):
+        stats_height = 300
+        name = Text(text=f'Name: {self.player.name}', color=(255, 255, 255),
+                         width=650, height=stats_height, font=pygame.font.SysFont('Arial', 15), align='left')
+        char_class = Text(text=f'Class: {self.player.__str__()}', color=(255, 255, 255),
+                          width=650, height=stats_height+20, font=pygame.font.SysFont('Arial', 15), align='left')
+        strength = Text(text=f'Strength: {self.player.strength}', color=(255, 255, 255),
+                        width=650, height=stats_height+40, font=pygame.font.SysFont('Arial', 15), align='left')
+        dexterity = Text(text=f'Dexterity: {self.player.dexterity}', color=(255, 255, 255),
+                         width=650, height=stats_height+60, font=pygame.font.SysFont('Arial', 15), align='left')
+        intel = Text(text=f'Intelligence: {self.player.intelligence}', color=(255, 255, 255),
+                     width=650, height=stats_height+80, font=pygame.font.SysFont('Arial', 15), align='left')
+        lvl = Text(text=f'Lvl: {self.player.lvl}', color=(255, 255, 255),
+                   width=650, height=stats_height+100, font=pygame.font.SysFont('Arial', 15), align='left')
+        exp = Text(text=f'Exp: {self.player.exp}', color=(255, 255, 255),
+                   width=650, height=stats_height+120, font=pygame.font.SysFont('Arial', 15), align='left')
+        exp_to_lvl = Text(text=f'Next lvl: {self.player.exp_to_next_lvl - self.player.exp}', color=(255, 255, 255),
+                          width=650, height=stats_height+140, font=pygame.font.SysFont('Arial', 15), align='left')
+        eq = Button(
+            650, 500, 150, 50, self.eq,
+            FONT, pygame.Surface((100, 32)), pygame.Surface((100, 32)),
+            pygame.Surface((100, 32)), 'EQ', (255, 255, 255))
+
+        if self.player.location == 'Village':
+            merchant = Button(
+                50, 50, 150, 50, self.merchant,
+                pygame.font.SysFont('Arial', 15), pygame.Surface((100, 32)), pygame.Surface((100, 32)),
+                pygame.Surface((100, 32)), 'Merchant', (255, 255, 255))
+            blacksmith = Button(
+                400, 50, 150, 50, self.blacksmith,
+                pygame.font.SysFont('Arial', 15), pygame.Surface((100, 32)), pygame.Surface((100, 32)),
+                pygame.Surface((100, 32)), 'Blacksmith', (255, 255, 255))
+            dungeon = Button(
+                200, 200, 150, 50, self.dungeon,
+                pygame.font.SysFont('Arial', 15), pygame.Surface((100, 32)), pygame.Surface((100, 32)),
+                pygame.Surface((100, 32)), 'Dungeon', (255, 255, 255))
+            self.all_buttons.add(merchant, dungeon, blacksmith)
+
+        self.all_buttons.add(eq)
+        self.all_text.add(name, char_class, strength, dexterity, intel, lvl, exp, exp_to_lvl)
+
+    def merchant(self):
+        pass
+
+    def blacksmith(self):
+        pass
+
+    def dungeon(self):
+        pass
+
+    def eq(self):
+        pass
 
     def logo(self):
         logo_text = Text(text='Welcome in RPG adventure.', color=(255, 255, 255), width=800/2, height=100, font=FONT)
@@ -55,8 +118,9 @@ class Game:
                                  height=177, callback=self.input_button)
         warrior_button = Button(
             50, 300, 150, 65, self.warrior,
-            FONT, IMAGE_NORMAL, IMAGE_HOVER, IMAGE_DOWN, 'Warrior', (255, 255, 255),)
-        class_text = Text(text=f'Class: {self.character_class}', color=(255, 255, 255), width=200, height=260, font=FONT)
+            FONT, IMAGE_NORMAL, IMAGE_HOVER, IMAGE_DOWN, 'Warrior', (255, 255, 255))
+        class_text = Text(text=f'Class: {self.character_class}',
+                          color=(255, 255, 255), width=45, height=230, font=FONT, align='left')
         self.all_buttons.add(back_button, start_button, input_button, warrior_button)
         self.all_text.add(text_name, class_text)
 
@@ -118,4 +182,5 @@ if __name__ == '__main__':
     pygame.init()
     g = Game(resolution)
     g.main_menu()
+    g.main_game()
     pygame.quit()
