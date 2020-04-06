@@ -1,71 +1,69 @@
 import sys
 import os
+import data.player as character
+cols = 100
+lines = 30
+player = character.Warrior('name')
 
-class Player:
-    lvl = 1
-    exp = 0
-    gold = 1000
-    eq = {
-        'helmet': 0,
-        'armor': 0,
-        'gloves': 0,
-        'legs': 0,
-        'boots': 0,
-        'first_weapon': 0,
-        'second_weapon': 0
 
-    }
-
-    def __init__(self, name, hp, hp_max, mana, mana_max, dmg, defensive, strength, dexterity, intelligence):
-        self.name = name
-        self.hp = hp
-        self.hp_max = hp_max
-        self.mana = mana
-        self.mana_max = mana_max
-        self.dmg = dmg
-        self.defensive = defensive
-        self.strength = strength
-        self.dexterity = dexterity
-        self.intelligence = intelligence
-
-    def show_stat(self):
-        pass
-
-    def wear_item(self):
-        pass
-
-    def take_off_item(self):
-        pass
-
-    def take_dmg(self):
-        pass
-
-    def heal(self):
-        pass
+def menu_logo():
+    print('#' * 100)
+    print(' ' * 37, 'Welcome in RPG adventure.')
+    print('#' * 100)
 
 
 def new():
-    pass
+    global player
+    option = ''
+    while option != 'yes':
+        os.system('cls')
+        menu_logo()
+        print(' ' * 39, 'Hi, tell me your name')
+        name = input("> ").capitalize()
+        print(' ' * (35-int(len(name)/2)), f'Okey, {name}, now tell me your class')
+        print(' ' * 45, 'You can be:')
+        print(' ' * 47, 'Warrior')
+        character_class = ''
+        while character_class not in ['Warrior']:
+            character_class = input("> ").capitalize()
+        os.system('cls')
+        menu_logo()
+        text = f'{name}, the {character_class} are you ready to new adventure?'
+        print(' ' * (50 - int(len(text)/2)), text)
+        option = input("> ").lower()
+        if character_class == 'Warrior':
+            player = character.Warrior(name)
+
 
 def load():
-    pass
+    raise NotImplementedError
+
 
 def title_screen():
-    print('#' * 100)
-    print(' ' * 36, 'Welcome in RPG adventure.', ' ' * 36)
-    print('#' * 100)
-    print(' ' * 42, '.: New Game :.', ' ' * 42)
-    print(' ' * 44, '.: Load :.', ' ' * 44)
-    print(' ' * 44, '.: Quit :.', ' ' * 44,)
     option = ''
-    while option not in ['new', 'new game', 'load', 'quit']:
+    while option not in ['new', 'new game', 'load', 'quit', 'q']:
+        menu_logo()
+        print(' ' * 42, '.: New Game :.', ' ' * 42)
+        print(' ' * 44, '.: Load :.', ' ' * 44)
+        print(' ' * 44, '.: Quit :.', ' ' * 44)
         option = input("> ").lower()
         if option == 'new' or option == 'new game':
             new()
+            main_game_loop()
         elif option == 'load':
             load()
-        elif option == 'quit':
+        elif option == 'quit' or option == 'q':
             sys.exit()
+        os.system('cls')
 
-os.system('mode con: cols=100 lines=30')
+def game_window():
+    print('─'*100)
+    option = input("> ").lower()
+
+def main_game_loop():
+    os.system('cls')
+    game_window()
+
+os.system(f'mode con: cols={cols} lines={lines}')
+os.system('cls')
 title_screen()
