@@ -66,3 +66,6 @@ class Warrior(Player):
     def __init__(self, name, hp=50, mana=0, defensive=0, strength=5, dexterity=2, intelligence=0):
         super().__init__(name=name, hp=hp, mana=mana, defensive=defensive,
                          strength=strength, dexterity=dexterity, intelligence=intelligence)
+
+    def __str__(self):
+        return 'Warrior'
