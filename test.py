@@ -1,5 +1,24 @@
 import unittest
 import data.player as player
+import data.map_generator as dungeon
+import numpy as np
+
+
+class Map(unittest.TestCase):
+    def test_map_generator(self):
+        tiles = [5, 10, 20, 100]
+        for tile in tiles:
+            new_map = dungeon.Map(tile)
+            result = np.reshape(new_map.rooms, -1)
+            result = [elem for elem in result if elem is not None]
+            self.assertEqual(tile, len(result))
+
+    def test_room(self):
+        text = 'test'
+        test_room = dungeon.Room(text)
+        self.assertEqual('?', str(test_room))
+        test_room.visited = True
+        self.assertEqual(text, str(test_room))
 
 
 class Player(unittest.TestCase):
