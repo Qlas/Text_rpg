@@ -60,11 +60,11 @@ class Game:
         char_class = Text(x=stats_width, y=stats_height + 20,
                           text=f'Class: {self.player.__str__()}', font=font, align='left')
         strength = Text(x=stats_width, y=stats_height + 40,
-                        text=f'Strength: {self.player.strength}', font=font, align='left')
+                        text=f'Strength: {self.player.stats["strength"]}', font=font, align='left')
         dexterity = Text(x=stats_width, y=stats_height + 60,
-                         text=f'Dexterity: {self.player.dexterity}', font=font, align='left')
+                         text=f'Dexterity: {self.player.stats["dexterity"]}', font=font, align='left')
         intel = Text(x=stats_width, y=stats_height + 80,
-                     text=f'Intelligence: {self.player.intelligence}', font=font, align='left')
+                     text=f'Intelligence: {self.player.stats["intelligence"]}', font=font, align='left')
         lvl = Text(x=stats_width, y=stats_height + 100,
                    text=f'Lvl: {self.player.lvl}', color=(255, 255, 255), font=font, align='left')
         exp = Text(x=stats_width, y=stats_height + 120,
