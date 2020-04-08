@@ -15,7 +15,7 @@ class Room:
         # if player visit this room, this will change to True
         self.visited = False
 
-    def __repr__(self):
+    def __str__(self):
         # before the player visits this room, he will not know what is inside
         if self.visited:
             return self.function
