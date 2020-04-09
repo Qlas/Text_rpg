@@ -1,5 +1,5 @@
 class Item:
-    def __init__(self, name, inv_type, stats=None):
+    def __init__(self, name=None, inv_type=None, stats=None):
         self.name = name
         self.inv_type = inv_type
         # stats = {'name': ['type','value']} stats ={'hp':['*',10]}
@@ -7,7 +7,7 @@ class Item:
         self.stats = stats
 
     def return_bonus(self, bonus_name, bonus_value):
-        if bonus_name in self.stats:
+        if self.name is not None and bonus_name in self.stats:
             if self.stats[bonus_name][0] == '+':
                 return self.stats[bonus_name][1]
             elif self.stats[bonus_name][0] == '*':
