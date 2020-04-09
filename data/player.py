@@ -1,27 +1,30 @@
 import data.item as item
 import copy
-
+import data.map_generator
 class Player:
     lvl = 1
     exp = 0
     exp_to_next_lvl = 100
     gold = 1000
+    # player actual eq
     eq = {
-        'helmet': None,
-        'armor': None,
-        'gloves': None,
-        'legs': None,
-        'boots': None,
-        'first_weapon': None,
-        'second_weapon': None
+        'helmet': item.Item(),
+        'armor': item.Item(),
+        'gloves': item.Item(),
+        'legs': item.Item(),
+        'boots': item.Item(),
+        'first_weapon': item.Item(),
+        'second_weapon': item.Item()
 
     }
     spell_book = {}
     location = 'Village'
+    # player inventory system, need to improve it
     inventory = {}
 
     def __init__(self, name, hp, mana, defensive, strength, dexterity, intelligence, max_item_in_inventory):
         self.name = name
+        # set player stats depends on player class
         self.stats = {
             'hp': 100 + hp,
             'max_hp': 100 + hp,
@@ -33,13 +36,20 @@ class Player:
             'dexterity': 5 + dexterity,
             'intelligence': 5 + intelligence
         }
+        # temporary inv system
         self.max_item_in_inventory = max_item_in_inventory
+        # stats_bonus is stats after add bonus from items, spells
         self.stats_bonus = copy.deepcopy(self.stats)
+        # math this stats
         self.stats_math()
+        self.dung = data.map_generator.Map(10)
 
     def stats_math(self):
+        # for every stats
         for stat_name, stat_value in self.stats.items():
+            # stat_sum is value with bonuses, starting from base value
             stat_sum = stat_value
+            # for every items
             for eq_name, eq_value in self.eq.items():
                 if eq_value is not None:
                     stat_sum += eq_value.return_bonus(stat_name, stat_value)
@@ -80,7 +90,7 @@ class Warrior(Player):
         super().__init__(name=name, hp=hp, mana=mana, defensive=defensive,
                          strength=strength, dexterity=dexterity, intelligence=intelligence, max_item_in_inventory=10)
         stats = {'dmg': ['+', 2], 'strength': ['*', 10]}
-        self.eq['helmet'] = item.Item('Training sword', 'first_weapon', stats)
+        self.eq['first_weapon'] = item.Item('Training sword', 'first_weapon', stats)
         self.stats_math()
 
     def __str__(self):
