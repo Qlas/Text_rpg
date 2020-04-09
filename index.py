@@ -104,25 +104,62 @@ class Game:
         pass
 
     def dungeon_map(self):
+        room_pos = [300, 300]
+        room_pos_start = [300, 300]
+        map_tiles = btn.get_map_image()
+        for room_x in self.player.dung.rooms:
+            map_any = False
+            for room in room_x:
+                neighbors = []
+                if room is None:
+                    pass
+                    # background = btn.ShowImage(map_tiles[0], room_pos, 16, 12)
+                    # self.all_text.add(background)
+                else:
+                    map_any = True
+                    for neighbor in room.neighbor.items():
+                        if neighbor[1] is not None:
+                            neighbors.append(neighbor[0])
+                    if neighbors == ['N', 'S', 'W', 'E']:
+                        background = btn.ShowImage(map_tiles[1], room_pos, 16, 12)
+                    elif neighbors == ['N', 'S', 'W']:
+                        background = btn.ShowImage(map_tiles[16], room_pos, 16, 12)
+                    elif neighbors == ['N', 'S', 'E']:
+                        background = btn.ShowImage(map_tiles[14], room_pos, 16, 12)
+                    elif neighbors == ['N', 'W', 'E']:
+                        background = btn.ShowImage(map_tiles[13], room_pos, 16, 12)
+                    elif neighbors == ['S', 'W', 'E']:
+                        background = btn.ShowImage(map_tiles[15], room_pos, 16, 12)
+                    elif neighbors == ['N', 'S']:
+                        background = btn.ShowImage(map_tiles[8], room_pos, 16, 12)
+                    elif neighbors == ['N', 'W']:
+                        background = btn.ShowImage(map_tiles[9], room_pos, 16, 12)
+                    elif neighbors == ['N', 'E']:
+                        background = btn.ShowImage(map_tiles[7], room_pos, 16, 12)
+                    elif neighbors == ['S', 'W']:
+                        background = btn.ShowImage(map_tiles[12], room_pos, 16, 12)
+                    elif neighbors == ['S', 'E']:
+                        background = btn.ShowImage(map_tiles[10], room_pos, 16, 12)
+                    elif neighbors == ['W', 'E']:
+                        background = btn.ShowImage(map_tiles[11], room_pos, 16, 12)
+                    elif neighbors == ['N']:
+                        background = btn.ShowImage(map_tiles[3], room_pos, 16, 12)
+                    elif neighbors == ['S']:
+                        background = btn.ShowImage(map_tiles[5], room_pos, 16, 12)
+                    elif neighbors == ['W']:
+                        background = btn.ShowImage(map_tiles[6], room_pos, 16, 12)
+                    else:
+                        background = btn.ShowImage(map_tiles[4], room_pos, 16, 12)
+                    self.all_text.add(background)
+                    if room == self.player.location:
+                        background = btn.ShowImage(map_tiles[18], room_pos, 16, 12)
+                        self.all_text.add(background)
+                room_pos[0] += 16
+            if map_any:
+                room_pos[1] += 12
+            room_pos[0] = room_pos_start[0]
+
         self.player_stats()
-        player_loc = Text(x=300, y=200, text=f'Player', font=pygame.font.SysFont('Arial', 15))
-        self.all_text.add(player_loc)
-        if self.player.location.neighbor['N'] is not None:
-            north = Text(x=300, y=150, text=f'{self.player.location.neighbor["N"]}',
-                         font=pygame.font.SysFont('Arial', 15))
-            self.all_text.add(north)
-        if self.player.location.neighbor['S'] is not None:
-            south = Text(x=300, y=250, text=f'{self.player.location.neighbor["S"]}',
-                         font=pygame.font.SysFont('Arial', 15))
-            self.all_text.add(south)
-        if self.player.location.neighbor['W'] is not None:
-            west = Text(x=250, y=200, text=f'{self.player.location.neighbor["W"]}',
-                        font=pygame.font.SysFont('Arial', 15))
-            self.all_text.add(west)
-        if self.player.location.neighbor['E'] is not None:
-            east = Text(x=350, y=200, text=f'{self.player.location.neighbor["E"]}',
-                        font=pygame.font.SysFont('Arial', 15))
-            self.all_text.add(east)
         move_north = Button(
             100, 460, 50, 50, self.move_north,
             pygame.font.SysFont('Arial', 15), pygame.Surface((100, 32)), pygame.Surface((100, 32)),
@@ -177,9 +214,9 @@ class Game:
     def dungeon(self):
         self.all_buttons = pygame.sprite.Group()
         self.all_text = pygame.sprite.Group()
-        tiles = 10
-        dung = Map(tiles)
-        self.player.location = dung.rooms[tiles][tiles]
+        tiles = 20
+        self.player.dung = Map(tiles)
+        self.player.location = self.player.dung.rooms[int(tiles / 2)][int(tiles / 2)]
         self.player.location.visited = True
         self.game_window()
 
@@ -287,7 +324,7 @@ class Game:
             if counter > 4:
                 counter2 += 1
                 counter = 1
-            save_button = Button(50+200*counter2, 120 + 70 * counter, 150, 65,
+            save_button = Button(50 + 200 * counter2, 120 + 70 * counter, 150, 65,
                                  self.start_loaded_game, text=save.name, arg=save)
             self.all_buttons.add(save_button)
             counter += 1
