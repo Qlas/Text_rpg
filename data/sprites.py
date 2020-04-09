@@ -1,4 +1,5 @@
 import pygame
+from PIL import Image
 
 pygame.font.init()
 
@@ -15,6 +16,15 @@ class Background(pygame.sprite.Sprite):
     def __init__(self, image_file, location, width=800, height=600):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(image_file)
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.image.get_rect()
+        self.rect.left, self.rect.top = location
+
+
+class ShowImage(pygame.sprite.Sprite):
+    def __init__(self, image, location, width=800, height=600):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = location
@@ -142,3 +152,21 @@ class InputText(pygame.sprite.Sprite):
             elif len(self.text) < 6:
                 self.text += event.unicode
                 self.create()
+
+
+def get_map_image():
+    im = Image.open(r'images\minimap.png')
+    w, h = im.size
+    i = 0
+    images = []
+    while i+7 < w:
+        im1 = im.crop((i, 0, i+7, h))
+        i += 7
+        mode = im1.mode
+        size = im1.size
+        data = im1.tobytes()
+
+        py_image = pygame.image.fromstring(data, size, mode)
+        images.append(py_image)
+
+    return images
