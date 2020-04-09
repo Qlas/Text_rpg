@@ -7,12 +7,13 @@ import numpy as np
 
 class Map(unittest.TestCase):
     def test_map_generator(self):
-        tiles = [5, 10, 20, 100]
-        for tile in tiles:
-            new_map = dungeon.Map(tile)
-            result = np.reshape(new_map.rooms, -1)
-            result = [elem for elem in result if elem is not None]
-            self.assertEqual(tile, len(result))
+        for _ in range(10):
+            tiles = [5, 10, 20, 100]
+            for tile in tiles:
+                new_map = dungeon.Map(tile)
+                result = np.reshape(new_map.rooms, -1)
+                result = [elem for elem in result if elem is not None]
+                self.assertEqual(tile, len(result))
 
     def test_room(self):
         text = 'test'
@@ -31,7 +32,6 @@ class Player(unittest.TestCase):
         self.assertEqual(self.character.stats['hp'], self.character.stats['max_hp'])
         self.assertEqual(self.character.stats['mana'], self.character.stats['max_mana'])
         self.assertEqual(self.character.stats['strength'], 10)
-        self.assertEqual(5, self.character.stats['strength'])
         self.assertEqual(self.character.stats['dexterity'], 7)
         self.assertEqual(self.character.stats['intelligence'], 5)
         self.assertEqual(self.character.stats['defensive'], 5)
