@@ -1,8 +1,8 @@
 import data.item as item
 import copy
-import data.map_generator
+
+
 class Player:
-    lvl = 1
     exp = 0
     exp_to_next_lvl = 100
     gold = 1000
@@ -26,6 +26,7 @@ class Player:
         self.name = name
         # set player stats depends on player class
         self.stats = {
+            'lvl': 1,
             'hp': 100 + hp,
             'max_hp': 100 + hp,
             'mana': 10 + mana,
@@ -42,7 +43,7 @@ class Player:
         self.stats_bonus = copy.deepcopy(self.stats)
         # math this stats
         self.stats_math()
-        self.dung = data.map_generator.Map(10)
+        self.dung = None
 
     def stats_math(self):
         # for every stats
@@ -55,8 +56,17 @@ class Player:
                     stat_sum += eq_value.return_bonus(stat_name, stat_value)
             self.stats_bonus[stat_name] = stat_sum
 
-    def wear_item(self):
-        pass
+    def wear_item(self, w_item):
+        """
+        :param w_item: get item which we want to wear
+        """
+        if self.eq[w_item.inv_type].name is None:
+
+            if all(self.stats[requirements_id] >= requirements_value
+                   for requirements_id, requirements_value in w_item.requirements.items()):
+                self.eq[w_item.inv_type] = w_item
+        else:
+            return w_item
 
     def take_off_item(self):
         pass
@@ -76,7 +86,7 @@ class Player:
             self.stats['hp'] = self.stats['max_hp']
 
     def lvl_up(self):
-        self.lvl += 1
+        self.stats['lvl'] += 1
         self.exp_to_next_lvl = int(self.exp_to_next_lvl * 1.5)
 
     def get_exp(self, exp):
