@@ -4,12 +4,12 @@ from PIL import Image
 pygame.font.init()
 
 FONT = pygame.font.SysFont('Comic Sans MS', 32)
-IMAGE_NORMAL = pygame.Surface((100, 32))
-IMAGE_NORMAL.fill((32, 22, 15))
-IMAGE_HOVER = pygame.Surface((100, 32))
-IMAGE_HOVER.fill((52, 42, 35))
-IMAGE_DOWN = pygame.Surface((100, 32))
-IMAGE_DOWN.fill((82, 72, 65))
+IMAGE_NORMAL = pygame.Surface((100, 32), pygame.SRCALPHA)
+# IMAGE_NORMAL.fill((32, 22, 15))
+IMAGE_HOVER = pygame.Surface((100, 32), pygame.SRCALPHA)
+# IMAGE_HOVER.fill((52, 42, 35))
+IMAGE_DOWN = pygame.Surface((100, 32), pygame.SRCALPHA)
+# IMAGE_DOWN.fill((82, 72, 65))
 
 
 class Background(pygame.sprite.Sprite):
@@ -21,11 +21,21 @@ class Background(pygame.sprite.Sprite):
         self.rect.left, self.rect.top = location
 
 
-class ShowImage(pygame.sprite.Sprite):
-    def __init__(self, image, location, width=800, height=600):
-        pygame.sprite.Sprite.__init__(self)
+class MiniMap(pygame.sprite.Sprite):
+    def __init__(self, image, location, group, width=800, height=600):
+        pygame.sprite.Sprite.__init__(self, group)
         self.image = image
         self.image = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.image.get_rect()
+        self.rect.left, self.rect.top = location
+
+
+class Bars(pygame.sprite.Sprite):
+    def __init__(self, color, location, width=800, height=600):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((800, 100))
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.image.fill(color)
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = location
 
