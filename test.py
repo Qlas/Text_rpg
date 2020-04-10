@@ -38,14 +38,14 @@ class Player(unittest.TestCase):
 
     def test_get_exp(self):
         self.assertEqual(self.character.exp, 0)
-        self.assertEqual(self.character.lvl, 1)
+        self.assertEqual(self.character.stats['lvl'], 1)
         self.character.get_exp(100)
         self.assertEqual(self.character.exp, 100)
-        self.assertEqual(self.character.lvl, 2)
+        self.assertEqual(self.character.stats['lvl'], 2)
         self.assertEqual(self.character.exp_to_next_lvl, 150)
         self.character.get_exp(1000)
         self.assertEqual(self.character.exp, 1100)
-        self.assertEqual(self.character.lvl, 7)
+        self.assertEqual(self.character.stats['lvl'], 7)
         self.assertEqual(self.character.exp_to_next_lvl, 1135)
 
     def test_hp(self):
@@ -76,6 +76,14 @@ class Player(unittest.TestCase):
         self.assertEqual(0.5, second_item_bonus_str)
         self.assertEqual(16, player_dmg+first_item_bonus_dmg+second_item_bonus_dmg)
         self.assertEqual(7.5, player_str + first_item_bonus_str + second_item_bonus_str)
+        requirements = {
+            'lvl': 2,
+            'strength': 0,
+            'dexterity': 0,
+            'intelligence': 0,
+        }
+        item3 = item.Item('test2', 'shield', stats2, requirements)
+        self.assertEqual(item3.requirements['lvl'], 2)
 
     def test_item_in_player(self):
         self.assertEqual(self.character.stats['hp'], self.character.stats_bonus['hp'])
@@ -89,6 +97,28 @@ class Player(unittest.TestCase):
         self.assertEqual(self.character.stats['intelligence'], self.character.stats_bonus['intelligence'])
         self.assertEqual(7, self.character.stats_bonus['dmg'])
         self.assertEqual(11, self.character.stats_bonus['strength'])
+        requirements = {
+            'lvl': 0,
+            'strength': 0,
+            'dexterity': 0,
+            'intelligence': 0,
+        }
+        stats = {'dmg': ['+', 5], 'strength': ['*', 10]}
+        item1 = item.Item('test', 'second_weapon', stats, requirements)
+        self.character.wear_item(item1)
+        self.assertEqual('test', self.character.eq['second_weapon'].name)
+        item2 = item.Item('test2', 'second_weapon', stats, requirements)
+        error = self.character.wear_item(item2)
+        self.assertEqual(item2, error)
+        self.assertNotEqual(item2, self.character.eq['second_weapon'])
+        requirements = {
+            'lvl': 0,
+            'strength': 20,
+            'dexterity': 0,
+            'intelligence': 0,
+        }
+        item2 = item.Item('test3', 'armor', stats, requirements)
+        self.assertNotEqual(item2, self.character.eq['armor'])
 
 
 if __name__ == '__main__':

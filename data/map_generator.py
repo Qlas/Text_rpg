@@ -14,6 +14,7 @@ class Room:
         self.function = function
         # if player visit this room, this will change to True
         self.visited = False
+        self.treasure = None
 
     def __str__(self):
         # before the player visits this room, he will not know what is inside
@@ -44,7 +45,7 @@ class Map:
 
     def generate(self):
         # list of function with weight
-        function = ['monster'] * 4 + ['treasure'] * 1 + ['nothing'] * 0
+        function = ['monster'] * 1 + ['treasure'] * 1 + ['nothing'] * 1
         result = []
         while len(result) < self.tiles:
             # reshape map to 1 dimension and return not None elements

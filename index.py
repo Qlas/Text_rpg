@@ -4,6 +4,9 @@ from data.sprites import Button, Text, InputText
 from data.map_generator import Map
 import data.sprites as btn
 import pickle
+import numpy as np
+import colorsys
+import data.functions
 
 screenSize = (800, 600)
 resolution = pygame.display.set_mode(screenSize)
@@ -52,8 +55,11 @@ class Game:
         stats_height = 10
         stats_width = 650
 
-        background = btn.Background('images/board_stone.png', [620, 0], 180, 200)
-        self.all_text.add(background)
+        self.all_text.add(btn.Background('images/board_stone.png', [620, 0], 180, 200))
+        bar_percentage = self.player.stats['hp'] / self.player.stats['max_hp']
+        h, s, v = 0.33 * bar_percentage, 1, 1
+        r, g, b = colorsys.hsv_to_rgb(h, s, v)
+        self.all_text.add(btn.Bars((int(255 * r), int(255 * g), int(255 * b)), [650, 0], 100, 10))
 
         name = Text(x=stats_width, y=stats_height,
                     text=f'Name: {self.player.name}', font=font, align='left')
@@ -66,7 +72,7 @@ class Game:
         intel = Text(x=stats_width, y=stats_height + 80,
                      text=f'Intelligence: {self.player.stats["intelligence"]}', font=font, align='left')
         lvl = Text(x=stats_width, y=stats_height + 100,
-                   text=f'Lvl: {self.player.lvl}', color=(255, 255, 255), font=font, align='left')
+                   text=f'Lvl: {self.player.stats["lvl"]}', color=(255, 255, 255), font=font, align='left')
         exp = Text(x=stats_width, y=stats_height + 120,
                    text=f'Exp: {self.player.exp}', color=(255, 255, 255), font=font, align='left')
         exp_to_lvl = Text(x=stats_width, y=stats_height + 140,
@@ -81,18 +87,19 @@ class Game:
             pygame.Surface((100, 32)), 'EQ', (255, 255, 255))
 
         if self.player.location == 'Village':
+
+            background = btn.Background('images/village.jpg', [0, 0], 800, 600)
+            self.all_text.add(background)
+
             merchant = Button(
-                50, 50, 150, 50, self.merchant,
-                pygame.font.SysFont('Arial', 15), pygame.Surface((100, 32)), pygame.Surface((100, 32)),
-                pygame.Surface((100, 32)), 'Merchant', (255, 255, 255))
+                80, 480, 150, 50, self.merchant,
+                pygame.font.SysFont('Arial', 15), text='Merchant', text_color=(255, 255, 255), image='')
             blacksmith = Button(
-                400, 50, 150, 50, self.blacksmith,
-                pygame.font.SysFont('Arial', 15), pygame.Surface((100, 32)), pygame.Surface((100, 32)),
-                pygame.Surface((100, 32)), 'Blacksmith', (255, 255, 255))
+                560, 370, 150, 50, self.blacksmith,
+                pygame.font.SysFont('Arial', 15), text='Blacksmith', text_color=(255, 255, 255), image='')
             dungeon = Button(
-                200, 200, 150, 50, self.dungeon,
-                pygame.font.SysFont('Arial', 15), pygame.Surface((100, 32)), pygame.Surface((100, 32)),
-                pygame.Surface((100, 32)), 'Dungeon', (255, 255, 255))
+                540, 160, 130, 110, self.dungeon,
+                pygame.font.SysFont('Arial', 15), text='Dungeon', text_color=(255, 255, 255), image='')
             self.all_buttons.add(merchant, dungeon, blacksmith)
 
         self.all_buttons.add(eq)
@@ -104,62 +111,73 @@ class Game:
         pass
 
     def dungeon_map(self):
-        room_pos = [300, 300]
-        room_pos_start = [300, 300]
+        room_pos = [680, 5]
+        room_pos_start = [680, 5]
         map_tiles = btn.get_map_image()
-        for room_x in self.player.dung.rooms:
-            map_any = False
-            for room in room_x:
-                neighbors = []
-                if room is None:
-                    pass
-                    # background = btn.ShowImage(map_tiles[0], room_pos, 16, 12)
-                    # self.all_text.add(background)
+        maps = pygame.sprite.Group()
+        center_tile = list(zip(np.where(self.player.dung.rooms == self.player.location)))
+        map_size = 3
+        background = btn.Background('images/dungeon_background.jpg', [0, 0], 800, 600)
+        map_background = btn.Background('images/board_stone.png', [room_pos[0]-7, room_pos[1]-5], 125, 94)
+        self.all_text.add(background, map_background)
+        for room_x in range(int(center_tile[0][0] - map_size), int(center_tile[0][0] + map_size + 1)):
+            if room_x >= len(self.player.dung.rooms):
+                room_x = len(self.player.dung.rooms) - 1
+            for room_y in range(int(center_tile[1][0] - map_size), int(center_tile[1][0] + map_size + 1)):
+                if room_y >= len(self.player.dung.rooms[0]):
+                    room_y = len(self.player.dung.rooms[0]) - 1
+                if self.player.dung.rooms[room_x, room_y] is None:
+                    btn.MiniMap(map_tiles[0], room_pos, maps, 16, 12)
                 else:
-                    map_any = True
-                    for neighbor in room.neighbor.items():
+                    neighbors = []
+                    for neighbor in self.player.dung.rooms[room_x, room_y].neighbor.items():
                         if neighbor[1] is not None:
                             neighbors.append(neighbor[0])
-                    if neighbors == ['N', 'S', 'W', 'E']:
-                        background = btn.ShowImage(map_tiles[1], room_pos, 16, 12)
-                    elif neighbors == ['N', 'S', 'W']:
-                        background = btn.ShowImage(map_tiles[16], room_pos, 16, 12)
-                    elif neighbors == ['N', 'S', 'E']:
-                        background = btn.ShowImage(map_tiles[14], room_pos, 16, 12)
-                    elif neighbors == ['N', 'W', 'E']:
-                        background = btn.ShowImage(map_tiles[13], room_pos, 16, 12)
-                    elif neighbors == ['S', 'W', 'E']:
-                        background = btn.ShowImage(map_tiles[15], room_pos, 16, 12)
-                    elif neighbors == ['N', 'S']:
-                        background = btn.ShowImage(map_tiles[8], room_pos, 16, 12)
-                    elif neighbors == ['N', 'W']:
-                        background = btn.ShowImage(map_tiles[9], room_pos, 16, 12)
-                    elif neighbors == ['N', 'E']:
-                        background = btn.ShowImage(map_tiles[7], room_pos, 16, 12)
-                    elif neighbors == ['S', 'W']:
-                        background = btn.ShowImage(map_tiles[12], room_pos, 16, 12)
-                    elif neighbors == ['S', 'E']:
-                        background = btn.ShowImage(map_tiles[10], room_pos, 16, 12)
-                    elif neighbors == ['W', 'E']:
-                        background = btn.ShowImage(map_tiles[11], room_pos, 16, 12)
-                    elif neighbors == ['N']:
-                        background = btn.ShowImage(map_tiles[3], room_pos, 16, 12)
-                    elif neighbors == ['S']:
-                        background = btn.ShowImage(map_tiles[5], room_pos, 16, 12)
-                    elif neighbors == ['W']:
-                        background = btn.ShowImage(map_tiles[6], room_pos, 16, 12)
-                    else:
-                        background = btn.ShowImage(map_tiles[4], room_pos, 16, 12)
-                    self.all_text.add(background)
-                    if room == self.player.location:
-                        background = btn.ShowImage(map_tiles[18], room_pos, 16, 12)
-                        self.all_text.add(background)
-                room_pos[0] += 16
-            if map_any:
-                room_pos[1] += 12
-            room_pos[0] = room_pos_start[0]
+                        if not self.player.dung.rooms[room_x, room_y].visited:
+                            btn.MiniMap(map_tiles[0], room_pos, maps, 16, 12)
+                        elif neighbors == ['N', 'S', 'W', 'E']:
+                            btn.MiniMap(map_tiles[1], room_pos, maps, 16, 12)
+                        elif neighbors == ['N', 'S', 'W']:
+                            btn.MiniMap(map_tiles[16], room_pos, maps, 16, 12)
+                        elif neighbors == ['N', 'S', 'E']:
+                            btn.MiniMap(map_tiles[14], room_pos, maps, 16, 12)
+                        elif neighbors == ['N', 'W', 'E']:
+                            btn.MiniMap(map_tiles[13], room_pos, maps, 16, 12)
+                        elif neighbors == ['S', 'W', 'E']:
+                            btn.MiniMap(map_tiles[15], room_pos, maps, 16, 12)
+                        elif neighbors == ['N', 'S']:
+                            btn.MiniMap(map_tiles[8], room_pos, maps, 16, 12)
+                        elif neighbors == ['N', 'W']:
+                            btn.MiniMap(map_tiles[9], room_pos, maps, 16, 12)
+                        elif neighbors == ['N', 'E']:
+                            btn.MiniMap(map_tiles[7], room_pos, maps, 16, 12)
+                        elif neighbors == ['S', 'W']:
+                            btn.MiniMap(map_tiles[12], room_pos, maps, 16, 12)
+                        elif neighbors == ['S', 'E']:
+                            btn.MiniMap(map_tiles[10], room_pos, maps, 16, 12)
+                        elif neighbors == ['W', 'E']:
+                            btn.MiniMap(map_tiles[11], room_pos, maps, 16, 12)
+                        elif neighbors == ['N']:
+                            btn.MiniMap(map_tiles[3], room_pos, maps, 16, 12)
+                        elif neighbors == ['S']:
+                            btn.MiniMap(map_tiles[5], room_pos, maps, 16, 12)
+                        elif neighbors == ['W']:
+                            btn.MiniMap(map_tiles[6], room_pos, maps, 16, 12)
+                        elif neighbors == ['E']:
+                            btn.MiniMap(map_tiles[4], room_pos, maps, 16, 12)
+                        if room_x == center_tile[0][0] and room_y == center_tile[1][0]:
+                            btn.MiniMap(map_tiles[18], room_pos, maps, 16, 12)
 
-        self.player_stats()
+                room_pos[0] += 16
+            room_pos[1] += 12
+            room_pos[0] = room_pos_start[0]
+        self.all_text.add(maps)
+
+        # self.player_stats()
+
+        bottom_background = btn.Background('images/board_stone.png', [-50, 430], 900, 250)
+        self.all_text.add(bottom_background)
+
         move_north = Button(
             100, 460, 50, 50, self.move_north,
             pygame.font.SysFont('Arial', 15), pygame.Surface((100, 32)), pygame.Surface((100, 32)),
@@ -179,12 +197,29 @@ class Game:
 
         self.all_buttons.add(move_north, move_south, move_west, move_east)
 
+    def fight(self):
+        pass
+
+    def treasure(self):
+        item = data.functions.generate_random_item(self.player)
+        print(item)
+        self.player.location.treasure = None
+
+    def initial_room(self):
+        if self.player.location.function == 'treasure':
+            self.treasure()
+        elif self.player.location.function == 'monster':
+            self.fight()
+        else:
+            pass
+        self.player.location.visited = True
+
     def move_north(self):
         if self.player.location.neighbor['N'] is not None:
             self.all_buttons = pygame.sprite.Group()
             self.all_text = pygame.sprite.Group()
             self.player.location = self.player.location.neighbor['N']
-            self.player.location.visited = True
+            self.initial_room()
             self.dungeon_map()
 
     def move_south(self):
@@ -192,7 +227,7 @@ class Game:
             self.all_buttons = pygame.sprite.Group()
             self.all_text = pygame.sprite.Group()
             self.player.location = self.player.location.neighbor['S']
-            self.player.location.visited = True
+            self.initial_room()
             self.dungeon_map()
 
     def move_west(self):
@@ -200,7 +235,7 @@ class Game:
             self.all_buttons = pygame.sprite.Group()
             self.all_text = pygame.sprite.Group()
             self.player.location = self.player.location.neighbor['W']
-            self.player.location.visited = True
+            self.initial_room()
             self.dungeon_map()
 
     def move_east(self):
@@ -208,13 +243,13 @@ class Game:
             self.all_buttons = pygame.sprite.Group()
             self.all_text = pygame.sprite.Group()
             self.player.location = self.player.location.neighbor['E']
-            self.player.location.visited = True
+            self.initial_room()
             self.dungeon_map()
 
     def dungeon(self):
-        self.all_buttons = pygame.sprite.Group()
         self.all_text = pygame.sprite.Group()
-        tiles = 20
+        self.all_buttons = pygame.sprite.Group()
+        tiles = 10
         self.player.dung = Map(tiles)
         self.player.location = self.player.dung.rooms[int(tiles / 2)][int(tiles / 2)]
         self.player.location.visited = True
@@ -341,13 +376,13 @@ class Game:
         background = btn.Background('images/background.jpg', [0, 0])
         self.screen.fill([255, 255, 255])
         self.screen.blit(background.image, background.rect)
-        self.all_buttons.draw(self.screen)
         self.all_text.draw(self.screen)
+        self.all_buttons.draw(self.screen)
 
 
 if __name__ == '__main__':
     pygame.init()
-    g = Game(resolution)
-    g.main_menu()
-    g.main_game()
+    game = Game(resolution)
+    game.main_menu()
+    game.main_game()
     pygame.quit()
